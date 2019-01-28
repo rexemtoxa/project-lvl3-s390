@@ -4,7 +4,6 @@
   "description": "rss-reader",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\"",
     "webpack": "webpack"
   },
   "repository": {
@@ -43,7 +42,6 @@
     "webpack-cli": "^3.2.1"
   },
   "dependencies": {
-    "bootstrap": "^4.2.1",
-    "surge": "^0.20.1"
+    "bootstrap": "^4.2.1"
   }
 }
