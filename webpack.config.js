@@ -23,4 +23,5 @@ module.exports = {
       template: 'template.html',
     }),
   ],
+  watch: true,
 };
