@@ -3,25 +3,7 @@ import { watch } from 'melanke-watchjs';
 import axios from 'axios';
 import renderInput from './renderInput';
 import renderList from './renderList';
-// http://lorem-rss.herokuapp.com/feed?unit=second&interval=30
-// http://www.autoexpress.co.uk/car-news/feed/
-// http://www.autocar.co.uk/rss
-// http://www.telegraph.co.uk/cars/rss.xml
-// http://feeds.bbci.co.uk/news/rss.xml
-
-const parseXml = (xml) => {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(xml, 'application/xml');
-  const title = doc.querySelector('title').textContent;
-  const description = doc.querySelector('description').textContent;
-  const items = [...doc.querySelectorAll('item')].map((item) => {
-    const titleArticle = item.querySelector('title').textContent;
-    const linkArticle = item.querySelector('link').textContent;
-    return { titleArticle, linkArticle };
-  });
-  return { title, description, items };
-};
-
+import parseXml from './parser';
 
 export default () => {
   const state = {
