@@ -4,3 +4,5 @@ node_js:
 
 script:
   - make lint
+
+after_success: - surge --project ./dist --domain rss-reader-ar.surge.sh
