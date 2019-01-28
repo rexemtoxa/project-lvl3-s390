@@ -7,9 +7,15 @@
       <div class="jumbotron">
         <h1 class="display-4">RSS Reader</h1>
           <form>
-            <label for="link">Enter the link  </label>
-            <input type="text" name="addLink" id="link" placeholder="https://example.com">
-            <button type="submit" class="btn btn-primary btn-lg" onclick="return false">add link</button>
+            <div class="form-group">
+              <label for="link" class="ml-3">Enter the link:</label>
+              <div class="col-4 mb-3">
+                <input type="text" value="" name="addLink" id="link" class="form-control" placeholder="https://example.com">
+              </div>
+              <div class="col-auto">
+                <button type="submit" class="btn btn-primary btn-lg" disabled>add link</button>
+              </div>
+              </div>
           </form>
       </div>
   </body>
