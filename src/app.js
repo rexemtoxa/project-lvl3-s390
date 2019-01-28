@@ -1,49 +1,66 @@
 import validator from 'validator';
 import { watch } from 'melanke-watchjs';
-import _ from 'lodash';
+import axios from 'axios';
+import renderInput from './renderInput';
+import renderList from './renderList';
+// http://lorem-rss.herokuapp.com/feed?unit=second&interval=30
+// http://www.autoexpress.co.uk/car-news/feed/
+// http://www.autocar.co.uk/rss
+// http://www.telegraph.co.uk/cars/rss.xml
+// http://feeds.bbci.co.uk/news/rss.xml
 
-
-const render = ({ input }) => {
-  const { value, valid } = input;
-
-  const inputLink = document.querySelector('input');
-  inputLink.value = value;
-  const button = document.querySelector('button');
-  button.disabled = !valid;
-  if (valid) {
-    inputLink.classList.remove('is-invalid');
-    inputLink.classList.add('is-valid');
-  } else {
-    inputLink.classList.remove('is-valid');
-    inputLink.classList.add('is-invalid');
-  }
+const parseXml = (xml) => {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xml, 'application/xml');
+  const title = doc.querySelector('title').textContent;
+  const description = doc.querySelector('description').textContent;
+  const items = [...doc.querySelectorAll('item')].map((item) => {
+    const titleArticle = item.querySelector('title').textContent;
+    const linkArticle = item.querySelector('link').textContent;
+    return { titleArticle, linkArticle };
+  });
+  return { title, description, items };
 };
+
 
 export default () => {
   const state = {
     input: {
       valid: false,
       value: '',
+      loading: false,
     },
-    listFeed: {},
+    listFeed: new Set(),
+    flowsFeed: [],
   };
 
   const input = document.getElementById('link');
-  input.addEventListener('change', ({ target }) => {
+  input.addEventListener('input', ({ target }) => {
     const { value } = target;
     state.input.value = value;
-    state.input.valid = validator.isURL(value) && !_.has(state.listFeed, value);
+    state.input.valid = validator.isURL(value) && !(state.listFeed.has(value));
   });
+
+  const proxy = 'https://cors-anywhere.herokuapp.com/';
 
   const form = document.querySelector('form');
   form.addEventListener('submit', (event) => {
     event.preventDefault();
-    const { value } = event;
-    state.listFeed = { ...state.listFeed, value };
+    const { value } = input;
+    state.input.loading = true;
+    axios.get(`${proxy}${value}`).then((res) => {
+      const rssFlow = parseXml(res.data);
+      state.flowsFeed = [rssFlow, ...state.flowsFeed];
+      state.input.loading = false;
+    }).catch((err) => {
+      console.log(err);
+      state.input.loading = false;
+    });
+    state.listFeed = state.listFeed.add(value);
     state.input.value = '';
     state.input.valid = false;
-    console.log(state.listFeed);
   });
 
-  watch(state, () => render(state));
+  watch(state.input, () => renderInput(state.input));
+  watch(state, 'flowsFeed', () => renderList(state.flowsFeed));
 };
