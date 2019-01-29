@@ -5,10 +5,13 @@ import renderInput from './renderInput';
 import renderList from './renderList';
 import parseXml from './parser';
 
+// http://lorem-rss.herokuapp.com/feed?unit=minute&interval=7
+
 export default () => {
   const state = {
     input: {
       valid: false,
+      submitDisable: true,
       value: '',
       loading: false,
     },
@@ -20,7 +23,7 @@ export default () => {
   input.addEventListener('input', ({ target }) => {
     const { value } = target;
     state.input.value = value;
-    state.input.valid = validator.isURL(value) && !(state.listFeed.has(value));
+    state.input.valid = (validator.isURL(value) && !(state.listFeed.has(value)));
   });
 
   const proxy = 'https://cors-anywhere.herokuapp.com/';
@@ -29,9 +32,10 @@ export default () => {
   form.addEventListener('submit', (event) => {
     event.preventDefault();
     const { value } = input;
+    const linkProxy = `${proxy}${value}`;
     state.input.loading = true;
-    axios.get(`${proxy}${value}`).then((res) => {
-      const rssFlow = parseXml(res.data);
+    axios.get(linkProxy).then((res) => {
+      const rssFlow = parseXml(res.data, linkProxy);
       state.flowsFeed = [rssFlow, ...state.flowsFeed];
       state.input.loading = false;
     }).catch((err) => {

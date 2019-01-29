@@ -10,6 +10,9 @@ export default (state) => {
     inputLink.classList.remove('is-valid');
     inputLink.classList.add('is-invalid');
   }
+  if (value === '') {
+    inputLink.classList.remove('is-invalid');
+  }
   const button = document.querySelector('button');
   button.disabled = !valid;
   if (loading) {
