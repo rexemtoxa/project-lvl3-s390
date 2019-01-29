@@ -39,8 +39,8 @@ export default () => {
       state.flowsFeed = [rssFlow, ...state.flowsFeed];
       state.input.loading = false;
     }).catch((err) => {
-      console.log(err);
       state.input.loading = false;
+      console.log(err);
     });
     state.listFeed = state.listFeed.add(value);
     state.input.value = '';
