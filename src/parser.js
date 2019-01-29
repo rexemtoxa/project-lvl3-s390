@@ -6,7 +6,8 @@ export default (xml) => {
   const items = [...doc.querySelectorAll('item')].map((item) => {
     const titleArticle = item.querySelector('title').textContent;
     const linkArticle = item.querySelector('link').textContent;
-    return { titleArticle, linkArticle };
+    const linkDescription = item.querySelector('description').textContent;
+    return { titleArticle, linkArticle, linkDescription };
   });
   return { title, description, items };
 };
