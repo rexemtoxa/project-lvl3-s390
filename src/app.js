@@ -6,7 +6,7 @@ import renderInput from './renderInput';
 import renderList from './renderList';
 import parseXml from './parser';
 
-// http://lorem-rss.herokuapp.com/feed?unit=minute&interval=7
+// http://lorem-rss.herokuapp.com/feed?unit=minute
 
 const isChanged = (oldState, newState) => (
   (_.differenceWith(newState, oldState, _.isEqual).length) !== 0);
@@ -57,7 +57,23 @@ export default () => {
     axios.all(requests).then((responses) => {
       const newFeeds = responses.map(res => parseXml(res.data, res.config.url));
       if (isChanged(flowsFeed, newFeeds)) {
-        state.flowsFeed = newFeeds;
+        const updatedFlowsFeeds = flowsFeed.reduce((acc, value, index) => {
+          const { items } = value;
+          const newValue = {
+            ...value,
+            items: _.unionWith(newFeeds[index].items, items, _.isEqual),
+          };
+          return [...acc, newValue];
+        }, []);
+
+        const amountNewFlows = state.flowsFeed.length - updatedFlowsFeeds.length;
+
+        if (amountNewFlows === 0) {
+          state.flowsFeed = updatedFlowsFeeds;
+        } else {
+          const newFlows = state.flowsFeed.slice(0, amountNewFlows);
+          state.flowsFeed = [...newFlows, ...updatedFlowsFeeds];
+        }
       } else {
         setTimeout(update, 5000, flowsFeed);
       }
