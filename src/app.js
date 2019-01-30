@@ -75,13 +75,13 @@ export default () => {
           const newFlows = state.flowsFeed.slice(0, amountNewFlows);
           state.flowsFeed = [...newFlows, ...updatedFlowsFeeds];
         }
-      } else {
-        setTimeout(update, 5000, flowsFeed);
       }
     }).catch((err) => {
       console.log(err);
-    });
+    })
+      .finally(() => setTimeout(update, 5000, state.flowsFeed));
   };
+  setTimeout(update, 5000, state.flowsFeed);
 
   const handlerBtnOpenModal = ({ target }) => {
     const currentTitle = target.nextElementSibling.textContent;
@@ -91,15 +91,9 @@ export default () => {
     const { linkDescription } = _.find(items, ({ titleArticle }) => titleArticle === currentTitle);
 
     state.modal.description = linkDescription;
-    state.modal.show = true;
   };
 
   watch(state, 'modal', () => rendeModal(state.modal));
-
   watch(state, 'input', () => rendeInput(state.input));
-
-  watch(state, 'flowsFeed', () => {
-    renderList(state.flowsFeed, handlerBtnOpenModal);
-    setTimeout(update, 5000, state.flowsFeed);
-  });
+  watch(state, 'flowsFeed', () => renderList(state.flowsFeed, handlerBtnOpenModal));
 };
