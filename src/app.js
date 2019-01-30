@@ -6,6 +6,7 @@ import rendeInput from './renderInput';
 import renderList from './renderList';
 import parseXml from './parser';
 import rendeModal from './renderModal';
+import rendeAlert from './renderAlert';
 
 const isChanged = (oldState, newState) => (
   (_.differenceWith(newState, oldState, _.isEqual).length) !== 0);
@@ -23,6 +24,7 @@ export default () => {
     modal: {
       description: '',
     },
+    userInformation: '',
   };
 
   const input = document.getElementById('link');
@@ -39,16 +41,19 @@ export default () => {
     event.preventDefault();
     const { value } = input;
     const linkProxy = `${proxy}${value}`;
+    state.userInformation = '';
     state.input.loading = true;
     axios.get(linkProxy).then((res) => {
       const rssFlow = parseXml(res.data, linkProxy);
       state.flowsFeed = [rssFlow, ...state.flowsFeed];
       state.input.loading = false;
+      state.listFeed = state.listFeed.add(value);
     }).catch((err) => {
       state.input.loading = false;
+      state.userInformation = `unfortunately "${value}" don't have RSS Feed at the moument. 
+      Please try agan later or enter other url`;
       console.log(err);
     });
-    state.listFeed = state.listFeed.add(value);
     state.input.value = '';
     state.input.valid = false;
   });
@@ -96,4 +101,5 @@ export default () => {
   watch(state, 'modal', () => rendeModal(state.modal));
   watch(state, 'input', () => rendeInput(state.input));
   watch(state, 'flowsFeed', () => renderList(state.flowsFeed, handlerBtnOpenModal));
+  watch(state, 'userInformation', () => rendeAlert(state.userInformation));
 };
