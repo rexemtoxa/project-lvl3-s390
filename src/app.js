@@ -1,11 +1,15 @@
 import validator from 'validator';
 import { watch } from 'melanke-watchjs';
 import axios from 'axios';
+import _ from 'lodash';
 import renderInput from './renderInput';
 import renderList from './renderList';
 import parseXml from './parser';
 
 // http://lorem-rss.herokuapp.com/feed?unit=minute&interval=7
+
+const isChanged = (oldState, newState) => (
+  (_.differenceWith(newState, oldState, _.isEqual).length) !== 0);
 
 export default () => {
   const state = {
@@ -47,6 +51,25 @@ export default () => {
     state.input.valid = false;
   });
 
+  const update = (flowsFeed) => {
+    console.log('step1');
+    const requests = flowsFeed.map(({ url }) => axios.get(url));
+    axios.all(requests).then((responses) => {
+      const newFeeds = responses.map(res => parseXml(res.data, res.config.url));
+      if (isChanged(flowsFeed, newFeeds)) {
+        state.flowsFeed = newFeeds;
+      } else {
+        setTimeout(update, 5000, flowsFeed);
+      }
+    }).catch((err) => {
+      console.log(err);
+    });
+  };
+
+
   watch(state.input, () => renderInput(state.input));
-  watch(state, 'flowsFeed', () => renderList(state.flowsFeed));
+  watch(state, 'flowsFeed', () => {
+    renderList(state.flowsFeed);
+    setTimeout(update, 5000, state.flowsFeed);
+  });
 };
