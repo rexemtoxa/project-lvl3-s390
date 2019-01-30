@@ -2,12 +2,10 @@ import validator from 'validator';
 import { watch } from 'melanke-watchjs';
 import axios from 'axios';
 import _ from 'lodash';
-import renderInput from './renderInput';
+import rendeInput from './renderInput';
 import renderList from './renderList';
 import parseXml from './parser';
-import renderModal from './renderModal';
-
-// http://lorem-rss.herokuapp.com/feed?unit=minute
+import rendeModal from './renderModal';
 
 const isChanged = (oldState, newState) => (
   (_.differenceWith(newState, oldState, _.isEqual).length) !== 0);
@@ -23,7 +21,6 @@ export default () => {
     listFeed: new Set(),
     flowsFeed: [],
     modal: {
-      show: false,
       description: '',
     },
   };
@@ -88,21 +85,19 @@ export default () => {
 
   const handlerBtnOpenModal = ({ target }) => {
     const currentTitle = target.nextElementSibling.textContent;
-
     const id = target.parentElement.dataset.title;
     const flowTitle = document.getElementById(id).textContent;
-
-
-    console.log(flowTitle);
     const { items } = state.flowsFeed.find(({ title }) => title === flowTitle);
     const { linkDescription } = _.find(items, ({ titleArticle }) => titleArticle === currentTitle);
+
     state.modal.description = linkDescription;
     state.modal.show = true;
   };
 
-  watch(state.modal, () => renderModal(state.modal));
+  watch(state, 'modal', () => rendeModal(state.modal));
 
-  watch(state.input, () => renderInput(state.input));
+  watch(state, 'input', () => rendeInput(state.input));
+
   watch(state, 'flowsFeed', () => {
     renderList(state.flowsFeed, handlerBtnOpenModal);
     setTimeout(update, 5000, state.flowsFeed);
