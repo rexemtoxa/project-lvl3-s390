@@ -13,7 +13,7 @@ export default (state) => {
   if (value === '') {
     inputLink.classList.remove('is-invalid');
   }
-  const button = document.querySelector('button');
+  const button = document.querySelector('button.btn');
   button.disabled = !valid;
   if (loading) {
     button.textContent = 'loading';

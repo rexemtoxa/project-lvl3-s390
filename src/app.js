@@ -48,14 +48,14 @@ export default () => {
       state.flowsFeed = [rssFlow, ...state.flowsFeed];
       state.input.loading = false;
       state.listFeed = state.listFeed.add(value);
+      state.input.value = '';
+      state.input.valid = false;
     }).catch((err) => {
       state.input.loading = false;
       state.userInformation = `unfortunately "${value}" don't have RSS Feed at the moument. 
       Please try agan later or enter other url`;
       console.log(err);
     });
-    state.input.value = '';
-    state.input.valid = false;
   });
 
   const update = (flowsFeed) => {

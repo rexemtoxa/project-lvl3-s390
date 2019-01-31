@@ -6,8 +6,8 @@ export default (list, handler) => {
   <ul>${list.map(({ title, description, items }) => {
     const id = _.uniqueId('titleFlow-');
     return `
-    <li class="list-group-item list-group-item-secondary col-4 mx-auto shadow p-3 mb-5 bg-white rounded" style="width: 1200px;">
-      <p id="${id}" class="text-center display-4 ">${title}</p>
+    <li class="list-group-item list-group-item-secondary col-8 mx-auto shadow p-3 mb-5 bg-white rounded">
+      <p id="${id}" class="text-center display-4">${title}</p>
       <p>${description}</p>
     </li>
     <ul>
