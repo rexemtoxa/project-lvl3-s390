@@ -2,11 +2,11 @@ import validator from 'validator';
 import { watch } from 'melanke-watchjs';
 import axios from 'axios';
 import _ from 'lodash';
-import rendeInput from './renderInput';
-import renderList from './renderList';
+import rendeInput from './renders/renderInput';
+import renderList from './renders/renderList';
 import parseXml from './parser';
-import rendeModal from './renderModal';
-import rendeAlert from './renderAlert';
+import rendeModal from './renders/renderModal';
+import rendeAlert from './renders/renderAlert';
 
 const isChanged = (oldState, newState) => (
   (_.differenceWith(newState, oldState, _.isEqual).length) !== 0);
@@ -44,7 +44,7 @@ export default () => {
     state.userInformation = '';
     state.input.loading = true;
     axios.get(linkProxy).then((res) => {
-      const rssFlow = parseXml(res.data, linkProxy);
+      const rssFlow = { ...parseXml(res.data), linkProxy };
       state.flowsFeed = [rssFlow, ...state.flowsFeed];
       state.input.loading = false;
       state.listFeed = state.listFeed.add(value);
@@ -59,9 +59,9 @@ export default () => {
   });
 
   const update = (flowsFeed) => {
-    const requests = flowsFeed.map(({ url }) => axios.get(url));
+    const requests = flowsFeed.map(({ linkProxy }) => axios.get(linkProxy));
     axios.all(requests).then((responses) => {
-      const newFeeds = responses.map(res => parseXml(res.data, res.config.url));
+      const newFeeds = responses.map(res => ({ ...parseXml(res.data), linkProxy: res.config.url }));
       if (isChanged(flowsFeed, newFeeds)) {
         const updatedFlowsFeeds = flowsFeed.reduce((acc, value, index) => {
           const { items } = value;
